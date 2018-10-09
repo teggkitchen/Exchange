@@ -4,6 +4,7 @@ import (
 	"errors"
 	msg "exchange/config"
 	configDB "exchange/database"
+	"fmt"
 	"time"
 )
 
@@ -33,6 +34,18 @@ type HistoricalMarket struct {
 }
 
 // 新增外幣
+// 比對幣別名稱重複
+func (money *Money) CheckMoneyName(name string) (err error) {
+	fmt.Println(name)
+	configDB.GormOpen.Debug().Table("moneys").Where("name=?", name).Scan(&money)
+
+	fmt.Println(money.Name)
+	if len(money.Name) > 0 {
+		return errors.New(msg.DATA_REPEAT_ERROR)
+	}
+	return nil
+}
+
 // 新增幣別名稱
 func (money *Money) InsertMoneyName(name string, buy float64, sell float64) (err error) {
 	money.Name = name
@@ -82,6 +95,30 @@ func InsertMoneyMarket(id int64, buy float64, sell float64) (err error) {
 }
 
 // 修改外幣
+// 比對買賣是否重複
+func (money *Money) CheckMoneyMarket(id int64, buy float64, sell float64) (isRepeat bool) {
+	var currentMarket CurrentMarket
+	// var tempBuy float64
+	// var tempSell float64
+
+	fmt.Println(buy)
+	fmt.Println(sell)
+	// configDB.GormOpen.Debug().Table("current_markets").Where("buy=? AND sell=?", buy, sell).Scan(&currentMarket)
+	// configDB.GormOpen.Debug().Table("current_markets").Select([]string{"buy"}).Where("buy=? AND sell=?", buy, sell).Scan(&tempBuy)
+	configDB.GormOpen.Debug().Table("current_markets").Where("buy=? AND sell=?", buy, sell).Scan(&currentMarket)
+	tempBuy := currentMarket.Buy
+	tempSell := currentMarket.Sell
+	// configDB.GormOpen.Debug().Table("current_markets").Where("sell='?'", sell).Scan(tempSell)
+	// fff := currentMarket.buy
+	// ppp := strconv.FormatFloat(fff, 'f', 6, 64)
+	// fmt.Println(ppp)
+	// fmt.Println(currentMarket.sell)
+
+	if tempBuy != 0 && tempSell != 0 {
+		return true
+	}
+	return false
+}
 func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err error) {
 	var currentMarket CurrentMarket
 	var historicalMarket HistoricalMarket
@@ -98,10 +135,11 @@ func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err 
 	historicalMarket.CreatedAt = time.Now()
 	historicalMarket.UpdatedAt = time.Now()
 
-	if err = configDB.GormOpen.Debug().Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
-		return err
-	}
-	if err = configDB.GormOpen.Debug().Table("current_markets").Model(&currentMarket).Updates(&currentMarket).Error; err != nil {
+	// if err = configDB.GormOpen.Debug().Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
+	// 	return err
+	// }
+
+	if err = configDB.GormOpen.Debug().Table("current_markets").Where("money_id=?", id).Model(&currentMarket).Updates(&currentMarket).Error; err != nil {
 		return err
 	}
 

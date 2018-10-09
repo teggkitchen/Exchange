@@ -59,8 +59,15 @@ func CreateMoney(c *gin.Context) {
 	//參數是否有值
 	if len(tempNameStr) > 0 && tempBuy > 0 && tempSell > 0 {
 
+		// 執行-檢查外幣名稱
+		err := money.CheckMoneyName(tempNameStr)
+		if err != nil {
+			ShowJsonMSG(c, code.ERROR, msg.DATA_REPEAT_ERROR)
+			return
+		}
+
 		// 執行-增加外幣
-		err := money.InsertMoneyName(tempNameStr, tempBuy, tempSell)
+		err = money.InsertMoneyName(tempNameStr, tempBuy, tempSell)
 		if err != nil {
 			ShowJsonMSG(c, code.ERROR, msg.WRITE_ERROR)
 			return
@@ -81,7 +88,11 @@ func UpdateMoney(c *gin.Context) {
 	var money model.Money
 	// 取得參數
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	tempNameStr := c.Request.FormValue("name")
+	if err != nil {
+		// 參數錯誤
+		ShowJsonMSG(c, code.ERROR, msg.ARGS_ERROR+"321")
+		return
+	}
 	tempBuyStr := c.Request.FormValue("buy")
 	tempBuy, err := strconv.ParseFloat(tempBuyStr, 64)
 	if err != nil {
@@ -98,10 +109,17 @@ func UpdateMoney(c *gin.Context) {
 	}
 
 	//參數是否有值
-	if len(tempNameStr) > 0 && tempBuy > 0 && tempSell > 0 {
+	if id >= 0 && tempBuy > 0 && tempSell > 0 {
+
+		// 檢查外幣金額是否重複
+		isRepeat := money.CheckMoneyMarket(id, tempBuy, tempSell)
+		if isRepeat == true {
+			ShowJsonMSG(c, code.ERROR, msg.PRICE_REPEAT_ERROR)
+			return
+		}
 
 		// 執行-修改外幣
-		err = money.UpdateMoneyMarket(tempNameStr, tempBuy, tempSell)
+		err = money.UpdateMoneyMarket(id, tempBuy, tempSell)
 		if err != nil {
 			ShowJsonMSG(c, code.ERROR, msg.WRITE_ERROR)
 			return

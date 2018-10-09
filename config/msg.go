@@ -26,4 +26,7 @@ const (
 	SQL_QUERY_ERROR          = "SQL查詢異常"
 	ADD_IMAGE_ERROR          = "新增圖片異常"
 	NOT_FOUND_PRODUCT_ERROR  = "找不到商品"
+
+	DATA_REPEAT_ERROR  = "幣別重複"
+	PRICE_REPEAT_ERROR = "金額與當前重複"
 )
