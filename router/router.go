@@ -10,10 +10,11 @@ import (
 func InitRouter() *gin.Engine {
 	router := gin.Default()
 
-	router.POST("/create_money", CreateMoney)
+	router.POST("/create", CreateMoney)
+	router.PUT("/update/:id", UpdateMoney)
+	router.DELETE("/delete/:id", DestroyMoney)
+
 	// router.GET("/moneys", ShowProducts)
-	// router.PUT("/money/:id", UpdateProduct)
-	// router.DELETE("/money/:id", DestroyProduct)
 
 	return router
 }

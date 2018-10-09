@@ -97,16 +97,15 @@ func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err 
 	historicalMarket.Sell = sell
 	historicalMarket.CreatedAt = time.Now()
 	historicalMarket.UpdatedAt = time.Now()
-	var updateMoney Money
 
-	if err = configDB.GormOpen.Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
+	if err = configDB.GormOpen.Debug().Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Table("current_markets").Model(&updateMoney).Updates(&currentMarket).Error; err != nil {
+	if err = configDB.GormOpen.Debug().Table("current_markets").Model(&currentMarket).Updates(&currentMarket).Error; err != nil {
 		return err
 	}
 
-	result := configDB.GormOpen.Table("historical_markets").Create(&historicalMarket)
+	result := configDB.GormOpen.Debug().Table("historical_markets").Create(&historicalMarket)
 	if result.Error != nil {
 		err = result.Error
 		return err
@@ -125,13 +124,13 @@ func (Money *Money) DestroyMoneyMarket(id int64) (err error) {
 	// 	return err
 	// }
 
-	if err = configDB.GormOpen.Table("moneys").Where("id=?", id).Delete(&Money).Error; err != nil {
+	if err = configDB.GormOpen.Debug().Table("moneys").Where("id=?", id).Delete(&Money).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Table("current_markets").Where("id=?", id).Delete(&Money).Error; err != nil {
+	if err = configDB.GormOpen.Debug().Table("current_markets").Where("id=?", id).Delete(&Money).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Table("historical_markets").Where("id=?", id).Delete(&Money{}).Error; err != nil {
+	if err = configDB.GormOpen.Debug().Table("historical_markets").Where("id=?", id).Delete(&Money).Error; err != nil {
 		return err
 	}
 
