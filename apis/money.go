@@ -112,7 +112,7 @@ func UpdateMoney(c *gin.Context) {
 	if id >= 0 && tempBuy > 0 && tempSell > 0 {
 
 		// 檢查外幣金額是否重複
-		isRepeat := money.CheckMoneyMarket(id, tempBuy, tempSell)
+		isRepeat := money.IsCheckMoneyMarket(id, tempBuy, tempSell)
 		if isRepeat == true {
 			ShowJsonMSG(c, code.ERROR, msg.PRICE_REPEAT_ERROR)
 			return

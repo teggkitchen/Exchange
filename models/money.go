@@ -66,14 +66,14 @@ func InsertMoneyMarket(id int64, buy float64, sell float64) (err error) {
 	var currentMarket CurrentMarket
 	var historicalMarket HistoricalMarket
 
-	//當前行情
+	//當前幣別行情
 	currentMarket.MoneyId = id
 	currentMarket.Buy = buy
 	currentMarket.Sell = sell
 	currentMarket.CreatedAt = time.Now()
 	currentMarket.UpdatedAt = time.Now()
 
-	//歷史行情
+	//歷史幣別行情
 	historicalMarket.MoneyId = id
 	historicalMarket.Buy = buy
 	historicalMarket.Sell = sell
@@ -96,53 +96,45 @@ func InsertMoneyMarket(id int64, buy float64, sell float64) (err error) {
 
 // 修改外幣
 // 比對買賣是否重複
-func (money *Money) CheckMoneyMarket(id int64, buy float64, sell float64) (isRepeat bool) {
+func (money *Money) IsCheckMoneyMarket(id int64, buy float64, sell float64) (isRepeat bool) {
 	var currentMarket CurrentMarket
-	// var tempBuy float64
-	// var tempSell float64
-
-	fmt.Println(buy)
-	fmt.Println(sell)
-	// configDB.GormOpen.Debug().Table("current_markets").Where("buy=? AND sell=?", buy, sell).Scan(&currentMarket)
-	// configDB.GormOpen.Debug().Table("current_markets").Select([]string{"buy"}).Where("buy=? AND sell=?", buy, sell).Scan(&tempBuy)
 	configDB.GormOpen.Debug().Table("current_markets").Where("buy=? AND sell=?", buy, sell).Scan(&currentMarket)
 	tempBuy := currentMarket.Buy
 	tempSell := currentMarket.Sell
-	// configDB.GormOpen.Debug().Table("current_markets").Where("sell='?'", sell).Scan(tempSell)
-	// fff := currentMarket.buy
-	// ppp := strconv.FormatFloat(fff, 'f', 6, 64)
-	// fmt.Println(ppp)
-	// fmt.Println(currentMarket.sell)
-
 	if tempBuy != 0 && tempSell != 0 {
 		return true
 	}
 	return false
 }
+
+//修改幣別行情
 func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err error) {
 	var currentMarket CurrentMarket
 	var historicalMarket HistoricalMarket
 
-	//當前行情
+	//當前幣別行情
 	currentMarket.Buy = buy
 	currentMarket.Sell = sell
 	currentMarket.UpdatedAt = time.Now()
 
-	//歷史行情
+	//歷史幣別行情
 	historicalMarket.MoneyId = id
 	historicalMarket.Buy = buy
 	historicalMarket.Sell = sell
 	historicalMarket.CreatedAt = time.Now()
 	historicalMarket.UpdatedAt = time.Now()
 
-	// if err = configDB.GormOpen.Debug().Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
-	// 	return err
-	// }
+	//判斷是否有此id
+	if err = configDB.GormOpen.Debug().Table("current_markets").Select([]string{"money_id"}).First(&currentMarket, id).Error; err != nil {
+		return err
+	}
 
+	//修改 當前幣別行情
 	if err = configDB.GormOpen.Debug().Table("current_markets").Where("money_id=?", id).Model(&currentMarket).Updates(&currentMarket).Error; err != nil {
 		return err
 	}
 
+	//增加 歷史幣別行情
 	result := configDB.GormOpen.Debug().Table("historical_markets").Create(&historicalMarket)
 	if result.Error != nil {
 		err = result.Error
