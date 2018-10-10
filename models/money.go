@@ -146,21 +146,18 @@ func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err 
 // 刪除外幣
 func (Money *Money) DestroyMoneyMarket(id int64) (err error) {
 
-	// if err = configDB.GormOpen.Table("moneys").Select([]string{"id"}).First(&Money, id).Error; err != nil {
-	// 	return err
-	// }
-
-	// if err = configDB.GormOpen.Table("moneys").Delete(&Money).Error; err != nil {
-	// 	return err
-	// }
-
+	//刪除 幣別名稱
 	if err = configDB.GormOpen.Debug().Table("moneys").Where("id=?", id).Delete(&Money).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Debug().Table("current_markets").Where("id=?", id).Delete(&Money).Error; err != nil {
+
+	//刪除 當前幣別行情
+	if err = configDB.GormOpen.Debug().Table("current_markets").Where("id=?", id).Delete(&CurrentMarket{}).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Debug().Table("historical_markets").Where("id=?", id).Delete(&Money).Error; err != nil {
+
+	//刪除 歷史幣別行情（批次）
+	if err = configDB.GormOpen.Debug().Table("historical_markets").Where(HistoricalMarket{MoneyId: +id}).Delete(&HistoricalMarket{}).Error; err != nil {
 		return err
 	}
 
