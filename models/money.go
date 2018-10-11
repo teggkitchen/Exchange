@@ -226,7 +226,6 @@ func (money *Money) QueryMoneys() (data interface{}, err error) {
 	} else if len(currentMarket[0:]) == 0 {
 		return nil, errors.New(msg.NOT_FOUND_DATA_ERROR)
 	}
-	defer configDB.GormOpen.Close()
 
 	for _, m := range moneys {
 		for _, c := range currentMarket {

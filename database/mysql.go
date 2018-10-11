@@ -12,9 +12,6 @@ var GormOpen *gorm.DB
 func init() {
 	var err error
 
-	// docker用
-	// GormOpen, err = gorm.Open("mysql", "root:12345600@tcp(exchange_mysql)/BUYDB?charset=utf8&parseTime=True&loc=Local&timeout=10ms")
-
 	// 正常連接mysql用
 	GormOpen, err = gorm.Open("mysql", "root:12345600@tcp(127.0.0.1:3307)/MONEY?charset=utf8&parseTime=True&loc=Local&timeout=10ms")
 

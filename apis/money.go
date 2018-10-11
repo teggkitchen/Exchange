@@ -13,20 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// // 展示全部外幣
-// func ShowProducts(c *gin.Context) {
-// 	var product model.Product
-// 	// 執行-查詢全部外幣
-// 	result, err := product.QueryProducts()
-
-// 	if err != nil {
-// 		ShowJsonMSG(c, code.ERROR, msg.NOT_FOUND_DATA_ERROR)
-// 		return
-// 	}
-// 	ShowJsonDATA(c, code.SUCCESS, msg.EXEC_SUCCESS, result)
-
-// }
-
 // 增加外幣
 func CreateMoney(c *gin.Context) {
 	var money model.Money
@@ -189,6 +175,12 @@ func UpdateMoney(c *gin.Context) {
 	}
 
 }
+
+/////////////////////////
+////    		     ////
+////    以下測試用    ////
+////    		     ////
+/////////////////////////
 
 // 修改外幣 - 併發
 func UpdateMoneyGoroutine(c *gin.Context) {
