@@ -103,11 +103,3 @@ go run main.go
 <!-- [Postman檔案](https://github.com/teggkitchen/buyapi/blob/master/postman/BuyApi.postman_collection.json) -->
 <a href="https://github.com/teggkitchen/Exchange/blob/master/postman.json" download="postman.json">Postman檔案
 </a>
-
-## 備註
-
-因一些環境參數的因素
-
-1. 建議使用go run main.go</br>
-2. docker不使用network以免影響sql的連線
-
