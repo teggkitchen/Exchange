@@ -137,7 +137,7 @@ func (money *Money) UpdateMoneyMarket(id int64, buy float64, sell float64) (err 
 	return nil
 }
 
-//修改幣別行情
+//修改幣別行情 - 回傳MoneyId
 func (money *Money) UpdateMoneyMarketTemp(id int64, buy float64, sell float64) (redId int64, err error) {
 	var currentMarket CurrentMarket
 	var historicalMarket HistoricalMarket

@@ -27,12 +27,12 @@ func InitRouter() *gin.Engine {
 
 	/////////////////////////
 	////    		     ////
-	////    以下測試用    ////
+	////    以下測試用     ////
 	////    		     ////
 	/////////////////////////
 	router.PUT("/moneygo/:id", UpdateMoneyGoroutine)
 	router.PUT("/moneygotest/:id", TestUpdateMoneyGoroutine)
-	router.GET("/test", TestMoney)
+	router.GET("/test/:id", TestUpdateMoney)
 
 	return router
 }
