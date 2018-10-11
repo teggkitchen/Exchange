@@ -312,14 +312,6 @@ func QueryMoneyGoroutine() {
 		}
 		fmt.Println(msg.EXEC_SUCCESS)
 
-		// result, err := money.QueryMoneys()
-		// fmt.Println(result)
-		// if err != nil {
-		// 	fmt.(c, code.ERROR, msg.)
-		// 	return
-		// }
-		// ShowJsonDATA(c, code.SUCCESS, msg., result)
-
 		c <- 1
 	}(finishChan)
 
@@ -339,6 +331,7 @@ func QueryMoneyGoroutine() {
 	}
 }
 
+// 併發 更新(未處理 條件競爭)
 func TestGoroutineUpdate(c *gin.Context) {
 	// 取得參數
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -350,7 +343,7 @@ func TestGoroutineUpdate(c *gin.Context) {
 	}
 
 	// 測試併發 Update
-	a := 0
+	a := 1
 	for a <= 1000 {
 		a++
 		fmt.Println("目前：", float64(a))
@@ -358,18 +351,10 @@ func TestGoroutineUpdate(c *gin.Context) {
 	}
 }
 
+// 併發 查詢
 func TestGoroutineQuery(c *gin.Context) {
-	// 取得參數
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	fmt.Println("ID", id)
-	if err != nil {
-		// 參數錯誤
-		ShowJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
-		return
-	}
-
 	// 測試併發 Query
-	a := 0
+	a := 1
 	for a <= 1000 {
 		a++
 		fmt.Println("目前：", float64(a))
