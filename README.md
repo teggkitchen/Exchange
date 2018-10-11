@@ -101,7 +101,7 @@ go run main.go
 
 ## 使用postman
 <!-- [Postman檔案](https://github.com/teggkitchen/buyapi/blob/master/postman/BuyApi.postman_collection.json) -->
-<a href="https://github.com/teggkitchen/buyapi/blob/master/postman/BuyApi.postman_collection.json" download="postman.json">Postman檔案
+<a href="https://github.com/teggkitchen/Exchange/blob/master/postman.json" download="postman.json">Postman檔案
 </a>
 
 ## 備註
