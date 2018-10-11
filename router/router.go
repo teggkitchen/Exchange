@@ -14,7 +14,11 @@ func InitRouter() *gin.Engine {
 	router.PUT("/money/:id", UpdateMoney)
 	router.DELETE("/money/:id", DestroyMoney)
 
-	// router.GET("/moneys", ShowProducts)
+	router.GET("/money/:id", QueryMoney)
+	router.GET("/moneys", QueryMoneys)
+	router.GET("/test", TestMoney)
+	router.PUT("/moneygo/:id", UpdateMoneyGoroutine)
+	router.PUT("/moneygotest/:id", TestUpdateMoneyGoroutine)
 
 	return router
 }
