@@ -27,12 +27,15 @@ func InitRouter() *gin.Engine {
 
 	/////////////////////////
 	////    		     ////
-	////    以下測試用     ////
+	////      測試用      ////
 	////    		     ////
 	/////////////////////////
-	router.PUT("/moneygo/:id", UpdateMoneyGoroutine)
-	router.PUT("/moneygotest/:id", TestUpdateMoneyGoroutine)
-	router.GET("/test/:id", TestUpdateMoney)
+
+	// 併發 查詢
+	router.GET("/testQuery", TestGoroutineQuery)
+
+	// 併發 更新(未處理 條件競爭)
+	router.GET("/testUpdate/:id", TestGoroutineUpdate)
 
 	return router
 }

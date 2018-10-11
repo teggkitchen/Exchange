@@ -222,30 +222,65 @@ func UpdateMoneyGoroutine(id int64, tempBuy float64, tempSell float64) {
 // 修改外幣 - Goroutine測試
 func UpdateMoneyGoroutine2(id int64, tempBuy float64, tempSell float64) {
 	var money model.Money
-	var wg sync.WaitGroup //存放Thread的空間，歸0則運行主程式
-	var mu sync.Mutex     //宣告互斥鎖
 	var err error
 
 	//參數是否有值
 	if id >= 0 && tempBuy >= 0 && tempSell >= 0 {
 		go func() {
-			wg.Add(1)
-			fmt.Println("變更準備")
-			mu.Lock() //互斥鎖 - 鎖住
-			fmt.Println("鎖住")
 			err = money.UpdateMoneyMarket(id, tempBuy, tempSell)
 			if err != nil {
 				fmt.Println("出錯:", msg.WRITE_ERROR)
 				return
 			}
-			mu.Unlock() //互斥鎖 - 解鎖
-			fmt.Println("解鎖")
 			fmt.Println("變更完成")
-			wg.Done()
 			fmt.Println("成功:", msg.UPDATE_SUCCESS)
 		}()
+	} else {
+		// 缺少參數
+		fmt.Println("出錯:", msg.ARGS_ERROR)
+		return
+	}
 
-		wg.Wait()
+}
+
+var WorkingCountUpdate int
+
+// 修改外幣 - Channel測試
+func UpdateMoneyGoroutine3(id int64, tempBuy float64, tempSell float64) {
+	var money model.Money
+	var err error
+
+	//參數是否有值
+	if id >= 0 && tempBuy >= 0 && tempSell >= 0 {
+		WorkingCountUpdate++
+		finishChan := make(chan int)
+
+		go func(c chan int) {
+			err = money.UpdateMoneyMarket(id, tempBuy, tempSell)
+			if err != nil {
+				fmt.Println("出錯:", msg.WRITE_ERROR)
+				return
+			}
+			fmt.Println("變更完成")
+			fmt.Println("成功:", msg.UPDATE_SUCCESS)
+
+			c <- 1
+		}(finishChan)
+
+		finishLoop := false
+
+		for {
+			if finishLoop {
+				break
+			}
+			select {
+			case n := <-finishChan:
+				WorkingCountUpdate -= n
+				if WorkingCountUpdate == 0 {
+					finishLoop = true
+				}
+			}
+		}
 
 	} else {
 		// 缺少參數
@@ -255,26 +290,90 @@ func UpdateMoneyGoroutine2(id int64, tempBuy float64, tempSell float64) {
 
 }
 
-func TestUpdateMoney(c *gin.Context) {
+var WorkingCountQuery int
+
+// 查詢外幣 - Channel測試
+func QueryMoneyGoroutine() {
+	var money model.Money
+	// var err error
+
+	//參數是否有值
+
+	WorkingCountQuery++
+	finishChan := make(chan int)
+
+	go func(c chan int) {
+		// 執行-查詢單一幣別行情
+		result, err := money.QueryMoneys()
+		fmt.Println(result)
+		if err != nil {
+			fmt.Println("出錯:", msg.NOT_FOUND_DATA_ERROR)
+			return
+		}
+		fmt.Println(msg.EXEC_SUCCESS)
+
+		// result, err := money.QueryMoneys()
+		// fmt.Println(result)
+		// if err != nil {
+		// 	fmt.(c, code.ERROR, msg.)
+		// 	return
+		// }
+		// ShowJsonDATA(c, code.SUCCESS, msg., result)
+
+		c <- 1
+	}(finishChan)
+
+	finishLoop := false
+
+	for {
+		if finishLoop {
+			break
+		}
+		select {
+		case n := <-finishChan:
+			WorkingCountQuery -= n
+			if WorkingCountQuery == 0 {
+				finishLoop = true
+			}
+		}
+	}
+}
+
+func TestGoroutineUpdate(c *gin.Context) {
 	// 取得參數
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	fmt.Println("ID", id)
 	if err != nil {
 		// 參數錯誤
 		ShowJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
 		return
 	}
-	// for i := 0; i < 1000; i++ {
-	// 	go func(ii int) {
-	// 		p := rand.Intn(300)
-	// 		fmt.Printf("Hello %d\n", p)
-	// 		UpdateMoneyGoroutine2(id, 100)
-	// 	}(i)
-	// }
 
+	// 測試併發 Update
 	a := 0
 	for a <= 1000 {
 		a++
-		UpdateMoneyGoroutine2(id, 1000, float64(a))
+		fmt.Println("目前：", float64(a))
+		UpdateMoneyGoroutine3(id, 1000, float64(a))
+	}
+}
+
+func TestGoroutineQuery(c *gin.Context) {
+	// 取得參數
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	fmt.Println("ID", id)
+	if err != nil {
+		// 參數錯誤
+		ShowJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
+		return
+	}
+
+	// 測試併發 Query
+	a := 0
+	for a <= 1000 {
+		a++
+		fmt.Println("目前：", float64(a))
+		QueryMoneyGoroutine()
 	}
 
 }
